@@ -1,0 +1,8 @@
+pip
+Django
+django-allauth
+django-crispy-forms
+django-cors-headers
+django-utils-six
+Pillow
+python-dotenv
