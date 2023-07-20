@@ -1,6 +1,7 @@
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.utils.safestring import mark_safe
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 # Create your views here.
 from django.shortcuts import render, redirect
@@ -58,7 +59,18 @@ def activate(request, uidb64, token):
         # return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
     else:
         return HttpResponse('Activation link is invalid!')
+def send_emails(request,email_template,message):
+    html_body = render_to_string(email_template, message)
+    # html_body = get_template("assessment/templates/template_email_test_invitation.html",merge_data).render()
 
+    message = EmailMultiAlternatives(
+        subject='Confirm email',
+        body="mail testing",
+        from_email=settings.EMAIL_HOST_USER,
+        to=[request.POST['email']]
+    )
+    message.attach_alternative(html_body, "text/html")
+    message.send(fail_silently=False)
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -68,84 +80,26 @@ def register(request):
             user.save()
             current_site = get_current_site(request)
 
-            mail_subject = 'Activate your blog account.'
             email_template = 'users/account_signup_confirmation_email.html'
-            message = render_to_string(email_template, {
-                'user': user.email,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                # 'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                'token': account_activation_token.make_token(user),
-            })
-            to_email = form.cleaned_data.get('email')
-            email = EmailMessage(
-                mail_subject, message, to=[to_email]
-            )
-            email.send()
+            message =  {
+                'user': mark_safe(str(user.email)),
+                'domain': mark_safe(str(current_site.domain)),
+                'uid': mark_safe(str(urlsafe_base64_encode(force_bytes(user.pk)))),
+                # # 'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                'token': mark_safe(str(account_activation_token.make_token(user))),
+            }
 
-            username = form.cleaned_data.get('email')
-            messages.success(request,f'Account created for {username}!')
+            send_emails(request,email_template,message)
 
-            # return HttpResponse('Please confirm your email address to complete the registration')
-            return redirect('users_signup_email_ok')
+            messages.success(request, f'Account created for {user.email}!')
+            return redirect('users_login')
 
-            # return redirect('users_login')
-    else:
+    else: # get
         form = UserRegisterForm()
         return render(request, 'users/signup.html', {'form': form})
-    # return render(request, 'users/login.html', {'form': form})
-    # email = request.POST['email']
-    # messages.error(request, f'{email} already existing, try another email!')
+    messages.success(request, 'wrong email/password')
+    return redirect('users_signup')
 
-    return redirect('users_signup_email_ko')
-
-# old implementation with function
-# @login_required
-# def profile(request):
-#     if request.method == 'POST':
-#         u_form = UserUpdateForm(request.POST,instance=request.user)
-#         p_form = ProfileUpdateForm(request.POST,
-#                                    request.FILES,
-#                                    instance=request.user.profile)
-#
-#         if u_form.is_valid() and p_form.is_valid():
-#             u_form.save()
-#             p_form.save()
-#             messages.success(request,f'Account update successfully!')
-#             return redirect('users_profile')
-#
-#     else:
-#         u_form = UserUpdateForm(instance=request.user)
-#         p_form = ProfileUpdateForm(instance=request.user.profile)
-#
-#     context = {
-#         'u_form':u_form,
-#         'p_form':p_form
-#     }
-#
-#     return render(request, 'users/profile.html',context)
-
-# class UserLoginView(LoginView):
-#         form_class = UserLoginForm
-#         template_name = "users/login.html"
-#
-#         def get(self, request, *args, **kwargs):
-#             return super().get(request, *args, **kwargs)
-#
-#         def get_context_data(self, **kwargs):
-#             ret = super(LoginView, self).get_context_data(**kwargs)
-#             signup_url = passthrough_next_redirect_url(self.request,
-#                                                        reverse("users_signup"),
-#                                                        self.redirect_field_name)
-#             redirect_field_value = get_request_param(self.request,
-#                                                      self.redirect_field_name)
-#             site = get_current_site(self.request)
-#
-#             ret.update({"signup_url": signup_url,
-#                         "site": site,
-#                         "redirect_field_name": self.redirect_field_name,
-#                         "redirect_field_value": redirect_field_value})
-#             return ret
 class UserLoginView(LoginView):
     form_class = UserLoginForm
     template_name = "users/login.html"
@@ -197,43 +151,6 @@ class UserSignupOkView(SignupView):
     template_name = "users/emailconfirmationsent.html"
     # success_url = reverse_lazy('users_login')
 
-# adding profile and register classes this would enable the
-# change in template when called from other apps in the project
-
-# class UserSignupView(SignupView):
-#     form_class = UserRegisterForm
-#     template_name = "users/signup.html"
-#     # success_url = 'users/login.html'
-#
-#     def get(self, *args, **kwargs):
-#         output = super().get(*args, **kwargs)
-#         return output
-#
-#     def get_context_data(self, **kwargs):
-#         ret = super(SignupView, self).get_context_data(**kwargs)
-#         form = ret['form']
-#         email = self.request.session.get('account_verified_email')
-#         if email:
-#             email_keys = ['email']
-#             if app_settings.SIGNUP_EMAIL_ENTER_TWICE:
-#                 email_keys.append('email2')
-#             for email_key in email_keys:
-#                 form.fields[email_key].initial = email
-#         login_url = passthrough_next_redirect_url(self.request,
-#                                                   reverse("users_login"),
-#                                                   self.redirect_field_name)
-#         redirect_field_name = self.redirect_field_name
-#         redirect_field_value = get_request_param(self.request,
-#                                                  redirect_field_name)
-#         ret.update({"login_url": login_url,
-#                     "redirect_field_name": redirect_field_name,
-#                     "redirect_field_value": redirect_field_value})
-#         return ret
-#
-#
-#     def post(self, request, *args, **kwargs):
-#         output = super().post(request,*args, **kwargs)
-#         return output
 @method_decorator(login_required, name='dispatch')
 class UserProfileView(UpdateView):
     template_name = 'users/profile.html'
@@ -275,27 +192,7 @@ class UserProfileChangePictureView(UpdateView):
         return context
 
     def get(self, request, *args, **kwargs):
-        # u_form = UserUpdateForm(instance=request.user)
-        # p_form = ProfileUpdateForm(instance=request.user.profile)
-        #
-        # context = {
-        #     'u_form': u_form,
-        #     'p_form': p_form
-        # }
-        # os.getcwd() # get the current work directory
 
-        # mylist2 = ['/'+f for f in glob.glob("users/media/profile_pics/gallery/*.*")]
-        # print('mylist2:')
-        # print(mylist2)
-        # mylist3 = [f for f in glob.glob("/home/ubuntu/project_grouping/users_management/users/media/profile_pics/gallery/*.*")]
-        # print('mylist3:')
-        # print(mylist3)
-
-        # current_dir = os. getcwd()
-        # print('current_dir:')
-        # print(current_dir)
-        # print(settings.BASE_DIR)
-        # rdir = "users/media/profile_pics/gallery" # needed in dev (for MAC?)
         rdir = os.path.join(settings.MEDIA_ROOT,"profile_pics/gallery") # needed in production
         files = os.listdir(rdir)
         files_path = [os.path.join("grouping/media/profile_pics/gallery",fil) for fil in files]
@@ -391,20 +288,3 @@ class UserChangePasswordView(PasswordChangeView):
         request.session['get_post'] = 'post'
         return super().post(request, *args, **kwargs)
 
-def send_emails(request,email_template,link,candidate,token):
-    # to add the tags
-    merge_data = {
-        'link': link,
-        'candidate': candidate,
-        'token':token,
-    }
-    html_body = render_to_string(email_template, merge_data)
-    #html_body = get_template("assessment/templates/template_email_test_invitation.html",merge_data).render()
-    message = EmailMultiAlternatives(
-       subject='Confirm Email',
-       body="Confirm Email",
-       from_email=request.user.email,
-       to=[request.POST['candidate_email']]
-    )
-    message.attach_alternative(html_body, "text/html")
-    message.send(fail_silently=False)
