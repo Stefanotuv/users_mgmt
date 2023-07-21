@@ -13,3 +13,22 @@ class UserSerialiser(serializers.ModelSerializer):
         fields = ['id', 'email', 'name', 'username', 'is_staff', 'is_superuser', 'is_active', 'last_login',
                   'date_joined', 'groups', 'user_permissions', 'profile']
 
+class UserSignupSerializer(serializers.Serializer):
+    # username = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True)
+    password_confirm = serializers.CharField(write_only=True)
+    email = serializers.EmailField()
+
+    def validate(self, data):
+        if data['password'] != data['password_confirm']:
+            raise serializers.ValidationError("Passwords do not match.")
+        return data
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            # username=validated_data['user'],
+            email=validated_data['email'],
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user

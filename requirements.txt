@@ -8,3 +8,4 @@ Pillow
 python-dotenv
 certifi
 djangorestframework
+djangorestframework-simplejwt
