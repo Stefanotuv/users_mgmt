@@ -151,5 +151,7 @@ EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL_PORT = os.environ['EMAIL_PORT']
 DEFAULT_FROM_EMAIL = os.environ['DEFAULT_FROM_EMAIL']
-
+# https://medium.com/@ste.tuveri/chatgpt-helped-with-django-email-from-google-certificate-error-ssl-certificate-verify-failed-771c560c1009
 os.environ['SSL_CERT_FILE'] = certifi.where()
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'

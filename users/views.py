@@ -10,7 +10,8 @@ from django.contrib import messages
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-
+from django.contrib.auth.tokens import default_token_generator
+# from django.utils.encoding import force_text
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, UserLoginForm, UserRegisterForm
 from allauth.account.views import LoginView, LogoutView, SignupView
 from allauth.account.views import _ajax_response
@@ -59,6 +60,29 @@ def activate(request, uidb64, token):
         # return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
     else:
         return HttpResponse('Activation link is invalid!')
+
+def account_activate(request, uidb64, token):
+    try:
+        # Decode the user ID from the URL-safe base64 encoding
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        # If the user and token are valid, activate the account
+        user.is_active = True
+        user.save()
+        messages.success(request, 'Your account has been activated. You can now log in.')
+        # activation_messages = 'Your account has been activated. You can now log in.'
+    else:
+        messages.error(request, 'Account activation link is invalid or has expired. try re-registering')
+        return redirect('users_signup')
+        # activation_messages = 'Account activation link is invalid or has expired. try re-registering'
+        # return render(request, 'users/setup.html', {'activation_messages': activation_messages})
+
+    return redirect('users_login')
+    # return render(request, 'users/login.html', {'activation_messages': activation_messages})
 def send_emails(request,email_template,message):
     html_body = render_to_string(email_template, message)
     # html_body = get_template("assessment/templates/template_email_test_invitation.html",merge_data).render()
@@ -81,17 +105,30 @@ def register(request):
             current_site = get_current_site(request)
 
             email_template = 'users/account_signup_confirmation_email.html'
+
+            # token = account_activation_token.make_token(user)
+            token = default_token_generator.make_token(user)
+            print("Generated Token:", token)
+
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            print("UID:", uid)
+
+            verification_url = reverse('account_activate', kwargs={'uidb64': uid, 'token': token})
+            print("Verification URL:", verification_url)
+
+            # Build the verification link with the domain, uid, and token
+            # verification_url = reverse('account_activate', kwargs={'uidb64': uid, 'token': token})
+            verification_link = f'http://{current_site.domain}{verification_url}'
+
             message =  {
-                'user': mark_safe(str(user.email)),
-                'domain': mark_safe(str(current_site.domain)),
-                'uid': mark_safe(str(urlsafe_base64_encode(force_bytes(user.pk)))),
-                # # 'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                'token': mark_safe(str(account_activation_token.make_token(user))),
-            }
+                    'user': mark_safe(str(user.email)),
+                    'domain': mark_safe(str(current_site.domain)),
+                    'verification_link': mark_safe(verification_link),  # Include the verification link here
+                }
 
             send_emails(request,email_template,message)
 
-            messages.success(request, f'Account created for {user.email}!')
+            messages.success(request, f'Account created for {user.email}! please check your email to activate your account')
             return redirect('users_login')
 
     else: # get

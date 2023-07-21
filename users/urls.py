@@ -5,6 +5,7 @@ from .views import UserLoginView, UserLogoutView, UserChangePasswordView,UserSig
 from django.contrib.auth import views as auth_view
 from django.conf import settings
 from django.conf.urls.static import static
+from users.views import register, account_activate
 
 urlpatterns = [
     path("/", UserLoginView.as_view(template_name='users/login.html'), name='users_login'),
@@ -21,14 +22,16 @@ urlpatterns = [
 
     path('profile/<pk>', UserProfileView.as_view(template_name='users/profile.html'),name='users_profile'),
 
+    path('activate/<str:uidb64>/<str:token>/', account_activate, name='account_activate'),
+
     # path('profile/change_picture', views.profile, name='users_profile'),
     # profile_change_picture.html
     # path('change_password/',auth_view.PasswordChangeView.as_view(),name='change_password'), # uses default template
     # path('change_password/', auth_view.PasswordChangeView.as_view(template_name='users/change_password.html'), name='change_password') # uses custom template
 
-    path('profile/change_picture/<pk>', UserProfileChangePictureView.as_view(template_name='users/change_password.html'), name='user_change_picture'), # uses custom template
+    # path('profile/change_picture/<pk>', UserProfileChangePictureView.as_view(template_name='users/change_password.html'), name='user_change_picture'), # uses custom template
 
-    path(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', views.activate, name='activate'),
+    # path(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', views.activate, name='activate'),
 
 
 

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% load static %}
+
 {% block title %} Log In {% endblock title %}
 
 {% block stylesheets %}
@@ -36,6 +37,16 @@
 
                                 <div class="signin-form">
                                     <h2 class="form-title">Login</h2>
+                                                    {% if messages %}
+
+                                                        {% for message in messages %}
+                                                        <div class="container-fluid p-0" style="padding-bottom: 2em;">
+                                                          <div class="alert {{ message.tags }} alert-dismissible" role="alert" style="background-color: green;" >
+                                                            {{ message }}
+                                                          </div>
+                                                        </div>
+                                                        {% endfor %}
+                                               {% endif %}
                                     <form method="POST" action="{% url 'users_login' %}" id="login-form">
                                         {% csrf_token %}
 
@@ -70,7 +81,8 @@
 <!--                                            <li><a href="#"><i class="display-flex-center zmdi zmdi-google"></i></a></li>-->
 <!--                                        </ul>-->
 <!--                                    </div>-->
-                                </div>
+
+                                    </div>
                             </div>
                         </div>
                         <!--</section>-->

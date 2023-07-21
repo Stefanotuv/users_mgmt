@@ -23,6 +23,17 @@
                                 <div class="signup-content">
                                     <div class="signup-form">
                                         <h2 class="form-title">Sign up</h2>
+                                    {% if messages %}
+                                            {% for message in messages %}
+
+                                                        <div class="container-fluid p-0" style="padding-bottom: 2em;">
+
+                                                  <div class="alert {{ message.tags }} alert-dismissible" role="alert" style="background-color: red;">
+                                                    {{ message.message }}
+                                                  </div>
+                                                </div>
+                                            {% endfor %}
+                                    {% endif %}
                                         <form method="POST" class="register-form" id="register-form">
                                             {% csrf_token %}
 <!--                                            {{ form.as_p }}-->
@@ -59,6 +70,7 @@
                                                 <input type="submit" name="signup" id="signup" class="form-submit" value="Register"/>
                                             </div>
                                         </form>
+
                                     </div>
                                     <div class="signup-image">
                                         <figure><img src="/static/build/images/signup-image.jpg" alt="sing up image"></figure>
