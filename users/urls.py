@@ -14,10 +14,10 @@ urlpatterns = [
     path('signup/', views.register, name='users_signup'),
     path('change_password/',UserChangePasswordView.as_view(template_name='users/change_password.html'),
          name='change_password'), # uses default template
-    path('signup/email_confirmation_ok',UserSignupOkView.as_view(template_name='users/template_email_user_created_ok.html'),
-         name='users_signup_email_ok'),
-    path('signup/email_confirmation_ko', UserSignupOkView.as_view(template_name='users/template_email_user_created_ko.html'),
-         name='users_signup_email_ko'),
+    # path('signup/email_confirmation_ok',UserSignupOkView.as_view(template_name='users/template_email_user_created_ok.html'),
+    #      name='users_signup_email_ok'),
+    # path('signup/email_confirmation_ko', UserSignupOkView.as_view(template_name='users/template_email_user_created_ko.html'),
+    #      name='users_signup_email_ko'),
     path('logout/',UserLogoutView.as_view(template_name='users/logout.html'),name='users_logout'),
 
     path('profile/<pk>', UserProfileView.as_view(template_name='users/profile.html'),name='users_profile'),
