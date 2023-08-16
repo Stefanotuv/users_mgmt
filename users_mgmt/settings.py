@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'django.contrib.sites',
     'users.apps.UsersConfig',
+    'connect_mgmt',
     'crispy_forms',
 
     # api
@@ -70,8 +71,8 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
-            BASE_DIR / 'templates',
-            os.path.join(BASE_DIR, 'connect_mgmt/templates'),
+            os.path.join(BASE_DIR, 'templates'),
+            # os.path.join(BASE_DIR, 'connect_mgmt/templates'),
         ]
         ,
         "APP_DIRS": True,

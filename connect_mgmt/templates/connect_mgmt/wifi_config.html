@@ -1,15 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>WiFi Configuration</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
     <h1>WiFi Configuration</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-
-        <button type="submit">Configure WiFi</button>
+        <div class="form-group">
+            <label for="mode">Select Mode:</label>
+            <select id="mode" name="mode">
+                <option value="wifi">WiFi</option>
+                <option value="ap">Access Point</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
-</body>
-</html>
+</div>
+{% endblock %}
