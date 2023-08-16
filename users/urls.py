@@ -8,7 +8,7 @@ from django.conf.urls.static import static
 from users.views import register, account_activate
 
 urlpatterns = [
-    path("/", UserLoginView.as_view(template_name='users/login.html'), name='users_login'),
+    path("", UserLoginView.as_view(template_name='users/login.html'), name='users_login'),
     path("login/",UserLoginView.as_view(template_name='users/login.html'),name='users_login'),
     # path("login/",UserLoginView.as_view(template_name='users/login.html'),name='account_login'),
     path('signup/', views.register, name='users_signup'),

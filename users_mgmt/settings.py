@@ -69,7 +69,10 @@ ROOT_URLCONF = "users_mgmt.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'templates']
+        "DIRS": [
+            BASE_DIR / 'templates',
+            os.path.join(BASE_DIR, 'connect_mgmt/templates'),
+        ]
         ,
         "APP_DIRS": True,
         "OPTIONS": {
@@ -79,6 +82,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
+
         },
     },
 ]

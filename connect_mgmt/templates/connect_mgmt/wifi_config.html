@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WiFi Configuration</title>
+</head>
+<body>
+    <h1>WiFi Configuration</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">Configure WiFi</button>
+    </form>
+</body>
+</html>
