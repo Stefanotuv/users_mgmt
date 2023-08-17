@@ -42,14 +42,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
+    'crispy_forms',
+    'bootstrap4',
+    'crispy_bootstrap4',
     # added to create user and profile
     'allauth',
     'allauth.account',
     'django.contrib.sites',
     'users.apps.UsersConfig',
     'connect_mgmt',
-    'crispy_forms',
+
 
     # api
     'rest_framework'
@@ -170,3 +172,5 @@ REST_FRAMEWORK = {
     ),
     # ...
 }
+# for crispy form
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

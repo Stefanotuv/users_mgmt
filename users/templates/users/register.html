@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="register-container">
+  <h2>Register</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Register</button>
+  </form>
+</div>
+{% endblock %}
+<script>
+// Example: Show/hide password toggle
+document.addEventListener("DOMContentLoaded", function() {
+  const passwordInput = document.querySelector("#id_password");
+  const togglePassword = document.querySelector("#toggle-password");
+
+  togglePassword.addEventListener("click", function() {
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+    } else {
+      passwordInput.type = "password";
+    }
+  });
+});
+</script>
