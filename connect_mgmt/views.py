@@ -9,11 +9,11 @@ import re
 def wifi_config_view(request):
     if request.method == 'POST':
         if request.POST['ap_wifi'] == 'ap':
-            # ap_ssid = request.POST['ap_ssid']
-            # ap_password = request.POST['ap_password']
-            # wifi_configurator = WiFiConfigurator()
-            # wifi_configurator.switch_to_ap_mode(ap_ssid, ap_password)
-            # wifi_configurator.restart_pi()
+            ap_ssid = request.POST['ap_ssid']
+            ap_password = request.POST['ap_password']
+            wifi_configurator = WiFiConfigurator()
+            wifi_configurator.switch_to_ap_mode(ap_ssid, ap_password)
+            wifi_configurator.restart_pi()
             pass
         elif request.POST['ap_wifi'] == 'wifi':
             wifi_ssid = request.POST['wifi_ssid']
