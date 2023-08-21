@@ -8,14 +8,23 @@ import re
 
 def wifi_config_view(request):
     if request.method == 'POST':
-        form = WiFiForm(request.POST)
-        if form.is_valid():
-            ssid = form.cleaned_data['ssid']
-            password = form.cleaned_data['password']
-
+        if request.POST['ap_wifi'] == 'ap':
+            # ap_ssid = request.POST['ap_ssid']
+            # ap_password = request.POST['ap_password']
+            # wifi_configurator = WiFiConfigurator()
+            # wifi_configurator.switch_to_ap_mode(ap_ssid, ap_password)
+            # wifi_configurator.restart_pi()
+            pass
+        elif request.POST['ap_wifi'] == 'wifi':
+            wifi_ssid = request.POST['wifi_ssid']
+            wifi_password = request.POST['wifi_password']
             wifi_configurator = WiFiConfigurator()
-            wifi_configurator.switch_to_wifi_mode(ssid, password)
+            wifi_configurator.switch_to_wifi_mode(wifi_ssid, wifi_password)
             wifi_configurator.restart_pi()
+            pass
+        pass
+
+        return render(request, 'connect_mgmt/wifi_config.html')
 
     else:
         wifi_configurator = WiFiConfigurator()
@@ -25,9 +34,8 @@ def wifi_config_view(request):
         networks = re.findall(r"ESSID:\"(.+)\"", scan_output.stdout)
 
         # Populate the form with scan results
-        network_choices = [(network, network) for network in networks]
+        network_choices = [network for network in networks]
         initial_data = {'ssid': '', 'password': ''}
-        form = WiFiForm(initial=initial_data, network_choices=network_choices)
 
-    return render(request, 'connect_mgmt/wifi_config.html', {'form': form})
+    return render(request, 'connect_mgmt/wifi_config.html', {'initial_data':initial_data,'network_choices':network_choices })
 
