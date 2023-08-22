@@ -6,10 +6,31 @@ class WiFiConfigurator:
     WPA_SUPPLICANT_FILE = "/etc/wpa_supplicant/wpa_supplicant.conf"
     HOSTAPD_CONF_FILE = "/etc/hostapd/hostapd.conf"
 
+    @classmethod
+    def get_current_mode(cls):
+        # Check if the hostapd service is running
+        hostapd_status = subprocess.run(["sudo", "systemctl", "is-active", "hostapd"], capture_output=True, text=True)
+        if hostapd_status.stdout.strip() == "active":
+            return "ap"
+
+        # Check if the wpa_supplicant service is running
+        wpa_supplicant_status = subprocess.run(["sudo", "systemctl", "is-active", "wpa_supplicant"],
+                                               capture_output=True, text=True)
+        if wpa_supplicant_status.stdout.strip() == "active":
+            return "wifi"
+
+        return None  # Return None if neither service is active
     @staticmethod
     def switch_to_ap_mode(ap_ssid, ap_password):
-        # Disable WiFi client mode
-        subprocess.run(["sudo", "systemctl", "stop", "wpa_supplicant"])
+        current_mode = WiFiConfigurator.get_current_mode()
+
+        if current_mode == "ap":
+            # Disable AP mode
+            subprocess.run(["sudo", "systemctl", "stop", "hostapd"])
+        else:
+            # Disable WiFi client mode
+            subprocess.run(["sudo", "systemctl", "stop", "wpa_supplicant"])
+
 
         # Start the access point
         subprocess.run(["sudo", "systemctl", "start", "hostapd"])
@@ -20,9 +41,16 @@ class WiFiConfigurator:
 
     @staticmethod
     def switch_to_wifi_mode(ssid, password):
-        # Stop the access point
-        # we need to test if it was on ap or wifi mode to start with
-        # subprocess.run(["sudo", "systemctl", "stop", "hostapd"])
+        current_mode = WiFiConfigurator.get_current_mode()
+
+        if current_mode == "ap":
+            # Disable AP mode
+            subprocess.run(["sudo", "systemctl", "stop", "hostapd"])
+        else:
+            # Disable WiFi client mode
+            subprocess.run(["sudo", "systemctl", "stop", "wpa_supplicant"])
+
+        # Start WiFi client mode
         subprocess.run(["sudo", "systemctl", "stop", "wpa_supplicant"])
         # Update wpa_supplicant.conf with WiFi credentials
         wpa_config = f"country=GB\n" \
