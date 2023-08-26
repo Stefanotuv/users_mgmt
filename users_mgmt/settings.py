@@ -32,6 +32,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# this has to be added to ensure the collection static works
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 # Application definition
 
@@ -150,6 +152,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'users','media') # MEDIA_ROOT = BASE_DIR
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'users/static'),
     os.path.join(BASE_DIR, 'users/media'),
+    os.path.join(BASE_DIR, 'connect_mgmt/static'),
+    os.path.join(BASE_DIR, 'connect_mgmt/media'),
 )
 
 # for email

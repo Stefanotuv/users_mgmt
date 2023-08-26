@@ -2,3 +2,8 @@
 - add the profile change (photo and other info)
 - add the link for the email confirmation (there should be a link to the site)
 - add the logic to verify the token
+
+
+
+- add the logic to save the file for the restart as a/wifi
+- deploy django in prod to make it starting at reboot

@@ -1,0 +1,126 @@
+# ----- ----- ----- ----- INSTALL GUNICORN ----- ----- ----- ----- ----- ----- -----
+# test that gunicorn can connect to the django app
+# gunicorn is used to enter the application through the wsgi file
+# NOTE: check the path for the file
+# sudo apt install gunicorn # not required gunicorn is install from the requirements file
+# you have to activate the venv to launch gunicorn
+source /home/stefano/projects/v_users/bin/activate
+
+cd /home/stefano/projects/users_mgmt
+gunicorn --bind 0.0.0.0:8000 users_mgmt.wsgi
+# note: it does not work using the absolute path.
+# you need to be in the right directory
+
+sudo mkdir /var/log/gunicorn
+
+sudo nano /etc/systemd/system/gunicorn.socket
+# ---------------------------------------------------------------------------
+[Unit]
+Description=gunicorn socket
+
+[Socket]
+ListenStream=/run/gunicorn.sock
+
+[Install]
+WantedBy=sockets.target
+# ---------------------------------------------------------------------------
+sudo nano /etc/systemd/system/gunicorn.service
+# ---------------------------------------------------------------------------
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=stefano
+Group=www-data
+WorkingDirectory=/home/stefano/projects/users_mgmt
+ExecStart=/home/stefano/projects/v_users/bin/gunicorn --access-logfile - --workers 3 --bind unix:/run/gunicorn.sock users_mgmt.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+# ---------------------------------------------------------------------------
+
+clear
+
+# start the service
+sudo systemctl start gunicorn.socket
+sudo systemctl enable gunicorn.socket
+
+# check status
+sudo systemctl status gunicorn.socket
+sudo systemctl status gunicorn
+
+# restart if you change any python file
+sudo systemctl daemon-reload
+sudo systemctl restart gunicorn
+
+
+
+# ----- ----- ----- ----- INSTALL NGINX ----- ----- ----- ----- ----- ----- -----
+# install the server
+sudo apt-get install nginx
+
+# make changes to the setting file. if you make changes directly in production be concious that the may get lost
+# if you need to run a pull request or actually the change can prevent the git pull
+# DEBUG = False
+# ALLOWED_HOSTS = ['*']
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+# Prepare the static files. This step is necessary to put all files on the folder static
+# without this steps the CSS and JS files cannot be served to the server
+source /home/stefano/projects/v_users/bin/activate
+python /home/stefano/projects/users_mgmt/manage.py collectstatic
+deactivate
+
+# create the files and link for NGINIX
+sudo nano /etc/nginx/sites-available/users_mgmt
+server {
+    listen 80;
+    server_name 192.168.2.46;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/stefano/projects/users_mgmt;
+    }
+    location /media/ {
+        root /home/stefano/projects/users_mgmt;
+    }
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/run/gunicorn.sock;
+    }
+}
+
+sudo gpasswd -a www-data stefano
+sudo -u www-data stat /home/stefano/projects/users_mgmt/static
+
+
+# enable the file by linking it to the sites-enabled directory
+sudo ln -s /etc/nginx/sites-available/users_mgmt /etc/nginx/sites-enabled
+
+# test nginx
+sudo nginx -t
+
+# restart if you change any python file
+sudo systemctl daemon-reload
+sudo systemctl restart gunicorn
+# restart server.
+sudo nginx -s reload
+sudo systemctl restart nginx
+sudo systemctl status nginx
+
+# test the ip address
+# if the default port is not open, add an ingress rule and in ubuntu add the below
+ssh ubuntu@141.147.115.202 -i /Users/stefano/.ssh/id_oci_test
+sudo iptables -I INPUT 5 -p tcp --dport 80 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+sudo netfilter-persistent save
+
+# https
+# https://pylessons.com/django-deployment
+sudo apt-get install python3-certbot-nginx
+
+sudo nano /etc/nginx/sites-available/AssessmentOI
+
+IP-webserver:
+
+sudo certbot --nginx -d IP-webserver -d IP-webserver

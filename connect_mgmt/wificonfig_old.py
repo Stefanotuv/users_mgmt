@@ -1,7 +1,3 @@
-# sudo chmod 777 /etc/wpa_supplicant/wpa_supplicant.conf
-# sudo chmod 777 /etc/network_mode.conf
-# sudo chmod 777 /etc/hostapd/hostapd.conf
-
 # wificonfig.py
 import subprocess
 import os
@@ -9,7 +5,6 @@ import os
 class WiFiConfigurator:
     WPA_SUPPLICANT_FILE = "/etc/wpa_supplicant/wpa_supplicant.conf"
     HOSTAPD_CONF_FILE = "/etc/hostapd/hostapd.conf"
-    NETWORK_MODE_FILE = "/etc/network_mode.conf"
 
     @classmethod
     def get_current_mode(cls):
@@ -25,12 +20,6 @@ class WiFiConfigurator:
             return "wifi"
 
         return None  # Return None if neither service is active
-
-    @classmethod
-    def write_network_mode(cls, mode):
-        with open(cls.NETWORK_MODE_FILE, "w") as mode_file:
-            mode_file.write(mode)
-
     @staticmethod
     def switch_to_ap_mode(ap_ssid, ap_password):
         current_mode = WiFiConfigurator.get_current_mode()
@@ -42,36 +31,13 @@ class WiFiConfigurator:
             # Disable WiFi client mode
             subprocess.run(["sudo", "systemctl", "stop", "wpa_supplicant"])
 
+
         # Start the access point
         subprocess.run(["sudo", "systemctl", "start", "hostapd"])
         # Update hostapd.conf with new AP SSID and password
-        if (ap_ssid == "" or ap_ssid == None):
-            ap_ssid = "pi_zero"
-        if (ap_password == "" or ap_password == None):
-            ap_password = "pi_zer0!"
-        hostapd_config = (f"#Set wireless interface\n" \
-                          f"interface=wlan0\n" \
-                          f"#driver\n"
-                          f"driver=nl80211\n"
-                          f"hw_mode=g\n"
-                          f"channel=6\n"
-                          f"ieee80211n=1\n"
-                          f"wmm_enabled=0\n"
-                          f"macaddr_acl=0\n"
-                          f"ignore_broadcast_ssid=0\n"
-                          f"auth_algs=1\n"
-                          f"wpa=2\n"
-                          f"wpa_key_mgmt=WPA-PSK\n"
-                          f"wpa_pairwise=TKIP\n"
-                          f"rsn_pairwise=CCMP\n"
-                          f"#Set network name\n" \
-                          f"ssid={ap_ssid}\nwpa_passphrase={ap_password}\n")
-
+        hostapd_config = f"ssid={ap_ssid}\nwpa_passphrase={ap_password}\n"
         with open(WiFiConfigurator.HOSTAPD_CONF_FILE, "w") as hostapd_file:
             hostapd_file.write(hostapd_config)
-
-        # Write the network mode to the configuration file
-        WiFiConfigurator.write_network_mode("ap")
 
     @staticmethod
     def switch_to_wifi_mode(ssid, password):
@@ -100,11 +66,11 @@ class WiFiConfigurator:
             print("Current working directory:", os.getcwd())
             print("File path:", WiFiConfigurator.WPA_SUPPLICANT_FILE)
 
-        # Write the network mode to the configuration file
-        WiFiConfigurator.write_network_mode("wifi")
+
+        # Enable WiFi client mode
+        # subprocess.run(["sudo", "echo", "your content here", ">", WiFiConfigurator.WPA_SUPPLICANT_FILE], shell=True)
 
         subprocess.run(["sudo", "systemctl", "start", "wpa_supplicant"])
-
     @staticmethod
     def restart_pi():
         subprocess.run(["sudo", "reboot"])

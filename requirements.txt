@@ -11,3 +11,4 @@ djangorestframework
 djangorestframework-simplejwt
 bootstrap4
 crispy-bootstrap4
+gunicorn
