@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'users.apps.UsersConfig',
     'connect_mgmt',
+    'camera',
+    'face_recognition_app',
 
 
     # api
@@ -154,6 +156,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'users/media'),
     os.path.join(BASE_DIR, 'connect_mgmt/static'),
     os.path.join(BASE_DIR, 'connect_mgmt/media'),
+    os.path.join(BASE_DIR, 'camera/static'),
+    os.path.join(BASE_DIR, 'camera/media'),
 )
 
 # for email

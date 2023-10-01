@@ -27,4 +27,6 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('api/', include('api_users.urls')),
     path('connect/', include('connect_mgmt.urls')),
+    path('camera/', include('camera.urls')),
+    # path('face_recognition/', include('face_recognition_app.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

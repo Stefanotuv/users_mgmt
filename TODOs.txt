@@ -7,3 +7,7 @@
 
 - add the logic to save the file for the restart as a/wifi
 - deploy django in prod to make it starting at reboot
+
+- the system should connect on AP if the system cannot connect on the recorded wifi (e.g not available) or the password is wrong.
+
+ At the moment there is no check on the error for tha WiFi ....

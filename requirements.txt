@@ -12,3 +12,5 @@ djangorestframework-simplejwt
 bootstrap4
 crispy-bootstrap4
 gunicorn
+picamera
+#opencv-python-headless

@@ -1,0 +1,17 @@
+sudo chmod 777 log_pi.txt
+sudo nano /etc/network_mode.conf
+sudo nano /etc/nginx/sites-available/users_mgmt
+sudo chmod 777 /etc/nginx/sites-available/users_mgmt
+sudo nano /etc/network_mode.conf
+sudo systemctl status dhcpcd.service
+sudo systemctl status hostapd
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+sudo nano /etc/dhcpcd.conf
+sudo chmod 777 /etc/hostapd/hostapd.conf
+sudo systemctl start dnsmasq
+ sudo nano /etc/network_mode.py
+
+sudo iptables -t nat POSTROUTING -o eth0 -j MASQUERADE
+sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+sudo iptables -A FORWARD -i eth0 -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo nano /etc/sysctl.conf

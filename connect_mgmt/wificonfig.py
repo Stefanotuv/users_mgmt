@@ -7,7 +7,7 @@ import subprocess
 import os
 
 class WiFiConfigurator:
-    WPA_SUPPLICANT_FILE = "/etc/wpa_supplicant/wpa_supplicant.conf"
+    WPA_SUPPLICANT_FILE = "/etc/wpa_supplicant/wpa_supplicant.conf "
     HOSTAPD_CONF_FILE = "/etc/hostapd/hostapd.conf"
     NETWORK_MODE_FILE = "/etc/network_mode.conf"
 
