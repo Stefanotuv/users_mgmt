@@ -6,11 +6,11 @@ django-cors-headers
 django-utils-six
 Pillow
 python-dotenv
-certifi
 djangorestframework
 djangorestframework-simplejwt
 bootstrap4
 crispy-bootstrap4
+certifi
 gunicorn
 picamera
 #opencv-python-headless

@@ -1,0 +1,25 @@
+
+
+mkdir projects
+cd projects
+
+
+
+
+git clone -b master https://github.com/Stefanotuv/users_mgmt.git
+
+# check the project
+
+ls
+
+# create vnenv
+
+python -m venv /home/stefano/projects/venv_wifi_ap
+
+source /home/stefano/projects/venv_wifi_ap/bin/activate
+
+# install requirements
+
+python3 -m pip install -r /home/stefano/projects/users_mgmt/requirements.txt
+
+sudo apt-get install libjpeg-dev zlib1g-dev libtiff-dev libfreetype6-dev liblcms2-dev libwebp-dev
