@@ -5,12 +5,19 @@
 # wificonfig.py
 import subprocess
 import os
+import datetime
 
 class WiFiConfigurator:
-    WPA_SUPPLICANT_FILE = "/etc/wpa_supplicant/wpa_supplicant.conf "
+    WPA_SUPPLICANT_FILE = "/etc/wpa_supplicant/wpa_supplicant.conf"
     HOSTAPD_CONF_FILE = "/etc/hostapd/hostapd.conf"
     NETWORK_MODE_FILE = "/etc/network_mode.conf"
+    LOG_FILE = "/home/stefano/log_pi.txt"  # Update this path
 
+    @classmethod
+    def log(message):
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(self.LOG_FILE, "a") as log_file:
+            log_file.write(f"{timestamp} - {message}\n")
     @classmethod
     def get_current_mode(cls):
         # Check if the hostapd service is running
@@ -34,12 +41,15 @@ class WiFiConfigurator:
     @staticmethod
     def switch_to_ap_mode(ap_ssid, ap_password):
         current_mode = WiFiConfigurator.get_current_mode()
-
+        WiFiConfigurator.log("wificonfig -> switch_to_ap_mode")
         if current_mode == "ap":
             # Disable AP mode
+            WiFiConfigurator.log("wificonfig -> current mode ap")
             subprocess.run(["sudo", "systemctl", "stop", "hostapd"])
+
         else:
             # Disable WiFi client mode
+            WiFiConfigurator.log("wificonfig -> current mode wifi")
             subprocess.run(["sudo", "systemctl", "stop", "wpa_supplicant"])
 
         # Start the access point
@@ -70,18 +80,22 @@ class WiFiConfigurator:
         with open(WiFiConfigurator.HOSTAPD_CONF_FILE, "w") as hostapd_file:
             hostapd_file.write(hostapd_config)
 
+        WiFiConfigurator.log("wificonfig -> modified hostapd_config")
+
         # Write the network mode to the configuration file
         WiFiConfigurator.write_network_mode("ap")
 
     @staticmethod
     def switch_to_wifi_mode(ssid, password):
         current_mode = WiFiConfigurator.get_current_mode()
-
+        WiFiConfigurator.log("wificonfig -> switch_to_wifi_mode")
         if current_mode == "ap":
             # Disable AP mode
+            WiFiConfigurator.log("wificonfig ->  current mode ap")
             subprocess.run(["sudo", "systemctl", "stop", "hostapd"])
         else:
             # Disable WiFi client mode
+            WiFiConfigurator.log("wificonfig ->  current mode wifi")
             subprocess.run(["sudo", "systemctl", "stop", "wpa_supplicant"])
 
         # Start WiFi client mode
@@ -94,9 +108,11 @@ class WiFiConfigurator:
         try:
             with open(WiFiConfigurator.WPA_SUPPLICANT_FILE, "w") as wpa_file:
                 wpa_file.write(wpa_config)
+                WiFiConfigurator.log("wificonfig ->  wpa_file.write(wpa_config)")
                 pass
         except Exception as e:
             print("Error:", e)
+            WiFiConfigurator.log("wificonfig -> " + e)
             print("Current working directory:", os.getcwd())
             print("File path:", WiFiConfigurator.WPA_SUPPLICANT_FILE)
 
