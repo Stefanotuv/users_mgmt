@@ -16,7 +16,7 @@ class WiFiConfigurator:
     @classmethod
     def log(cls,message):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        with open(self.LOG_FILE, "a") as log_file:
+        with open(cls.LOG_FILE, "a") as log_file:
             log_file.write(f"{timestamp} - {message}\n")
     @classmethod
     def get_current_mode(cls):
