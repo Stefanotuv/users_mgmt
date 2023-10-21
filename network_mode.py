@@ -207,6 +207,7 @@ def main():
                 log(f'pre hostapd')
                 start_hostapd()
                 # update_nginx()
+                update_nginx("192.168.4.1")
                 log("Switched to AP mode")
             elif network_mode == "wifi":
                 log(f'pre start_wpa_supplicant')
