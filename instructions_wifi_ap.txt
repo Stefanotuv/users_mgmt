@@ -301,6 +301,6 @@ sudo nano users_mgmt/connect_mgmt/wificonfig.py
 
 sudo chmod 777 /etc/hostapd/hostapd.conf
 
-
+sudo chmod 777 /home/stefano/log_pi.txt
 
 sudo chmod 777 /etc/wpa_supplicant/wpa_supplicant.conf
