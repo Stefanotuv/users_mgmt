@@ -14,7 +14,7 @@ class WiFiConfigurator:
     LOG_FILE = "/home/stefano/log_pi.txt"  # Update this path
 
     @classmethod
-    def log(message):
+    def log(cls,message):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open(self.LOG_FILE, "a") as log_file:
             log_file.write(f"{timestamp} - {message}\n")
