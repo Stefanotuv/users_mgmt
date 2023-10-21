@@ -213,12 +213,13 @@ def main():
                 start_wpa_supplicant()
                 # update_nginx()
                 log("Switched to WiFi mode")
+                nginx_update_t = threading.Thread(target=update_nginx_thread)
+                nginx_update_t.start()
             else:
                 log("Unknown network mode:", network_mode)
 
         # Start the nginx_update_background thread
-        nginx_update_t = threading.Thread(target=update_nginx_thread)
-        nginx_update_t.start()
+
 
     except Exception as e:
         log(f"Error: {e}")
